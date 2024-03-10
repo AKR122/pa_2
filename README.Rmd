@@ -1,0 +1,48 @@
+---
+title: "README"
+author: "Alexander Rogers"
+date: "2024-03-10"
+output: github_document
+---
+
+``` {r}
+library("tidyverse")
+library("stringr")
+```
+
+
+``` {r}
+stressed <- c(
+  "capo_2", "pinto_2", "pujo_2", "quemo_2", "testo_2"
+)
+unstressed <- c(
+  "capo_1", "pinto_1", "pujo_1", "quemo_1", "testo_1"
+)
+
+data <- read_csv("./data/data.csv") %>%
+  mutate(
+    stress = case_when(
+      info %in% stressed ~ "stressed",
+      info %in% unstressed ~ "unstressed",
+      TRUE ~ "NA"
+    )
+  )
+
+glimpse(data)
+write.csv(data, "data.csv")
+```
+
+``` {r}
+data |>
+  pivot_longer(cols = durationV:int, names_to = "measure", values_to = "val") |>
+  ggplot() +
+  aes(x = measure, y = val, fill = stress) +
+geom_boxplot()
+
+data |>
+  pivot_longer(cols = durationV:int, names_to = "measure", values_to = "val") |>
+  group_by(stress, measure) |>
+  summarize(avg = mean(val)) |>
+  pivot_wider(names_from = "stress", values_from = "avg")
+
+```
